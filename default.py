@@ -95,19 +95,19 @@ class LangPrefMan_Player(xbmc.Player) :
                 self.audio_changed = True
                 fa = True
             else:
-                log(LOG_INFO, 'Filename preference: No match found for audio track ({0})'.format(self.getPlayingFile()))
+                log(LOG_INFO, 'Filename preference: No match found for current audio track ({0})'.format(self.getPlayingFile()))
                 
             if (sub >= 0) and sub < len(self.subtitles):
                 self.setSubtitleStream(sub)
                 fs = True
                 log(LOG_INFO, 'Filename preference: Match, selecting subtitle track {0}'.format(sub))
                 if settings.turn_subs_on:
-                    log(LOG_DEBUG, 'Subtitle: enabling subs' )
+                    log(LOG_DEBUG, 'Subtitles: enabling subtitles' )
                     self.showSubtitles(True)
             else:
                 log(LOG_INFO, 'Filename preference: No match found for subtitle track ({0})'.format(self.getPlayingFile()))
                 if settings.turn_subs_off:
-                    log(LOG_INFO, 'Subtitle: disabling subs' )
+                    log(LOG_INFO, 'Subtitles: disabling subtitles' )
                     self.showSubtitles(False)
 
         #import web_pdb; web_pdb.set_trace()  
@@ -118,7 +118,7 @@ class LangPrefMan_Player(xbmc.Player) :
                 trackIndex = self.evalAudioPrefs(settings.AudioPrefs)
                 
             if trackIndex == -2:
-                log(LOG_INFO, 'Audio: None of the preferred languages is available' )
+                log(LOG_INFO, 'Audio: None of the preferred languages are available' )
             elif trackIndex >= 0:
                 self.setAudioStream(trackIndex)
                 self.audio_changed = True
@@ -130,19 +130,19 @@ class LangPrefMan_Player(xbmc.Player) :
                 trackIndex = self.evalSubPrefs(settings.SubtitlePrefs)
                 
             if trackIndex == -2:
-                log(LOG_INFO, 'Subtitle: None of the preferred languages is available' )
+                log(LOG_INFO, 'Subtitles: None of the preferred languages are available' )
                 if settings.turn_subs_off:
-                    log(LOG_INFO, 'Subtitle: disabling subs' )
+                    log(LOG_INFO, 'Subtitles: disabling subtitles' )
                     self.showSubtitles(False)
             if trackIndex == -1:
-                log(LOG_INFO, 'Subtitle: Preferred subtitle is selected but might not be enabled' )
+                log(LOG_INFO, 'Subtitles: Preferred subtitle is selected, but might not be enabled' )
                 if settings.turn_subs_on and not self.selected_sub_enabled:
-                    log(LOG_INFO, 'Subtitle: enabling subs because selected sub is not enabled' )
+                    log(LOG_INFO, 'Subtitles: enabling subtitles because selected subtitles are not enabled' )
                     self.showSubtitles(True)
             elif trackIndex >= 0:
                 self.setSubtitleStream(trackIndex)
                 if settings.turn_subs_on:
-                    log(LOG_INFO, 'Subtitle: enabling subs' )
+                    log(LOG_INFO, 'Subtitles: enabling subtitles' )
                     self.showSubtitles(True)
                 
         if settings.condsub_prefs_on and not fs:
@@ -152,14 +152,14 @@ class LangPrefMan_Player(xbmc.Player) :
                 trackIndex = self.evalCondSubPrefs(settings.CondSubtitlePrefs)
 
             if trackIndex == -1:
-                log(LOG_INFO, 'Conditional subtitle: disabling subs' )
+                log(LOG_INFO, 'Conditional subtitles: disabling subtitles' )
                 self.showSubtitles(False)
             if trackIndex == -2:
-                log(LOG_INFO, 'Conditional subtitle: No matching preferences found fo current audio stream. Doing nothing.')
+                log(LOG_INFO, 'Conditional subtitles: No matching preferences found for current audio stream, aborting')
             elif trackIndex >= 0:
                 self.setSubtitleStream(trackIndex)
                 if settings.turn_subs_on:
-                    log(LOG_DEBUG, 'Subtitle: enabling subs' )
+                    log(LOG_DEBUG, 'Subtitles: enabling subtitles' )
                     self.showSubtitles(True)
 
     def evalFilenamePrefs(self):
@@ -210,7 +210,7 @@ class LangPrefMan_Player(xbmc.Player) :
                     else:
                         for stream in self.audiostreams:
                             if ((code == stream['language']) or (name == stream['language'])):
-                                log(LOG_INFO, 'Audio language of stream {0} matches preference {1} ({2})'.format(stream['index'], i, name) )
+                                log(LOG_INFO, 'Audio language of the current stream {0} matches preference {1} ({2})'.format(stream['index'], i, name) )
                                 return stream['index']
                         log(LOG_INFO, 'Audio: preference {0} ({1}:{2}) not available'.format(i, name, code) )
         return -2
@@ -225,7 +225,7 @@ class LangPrefMan_Player(xbmc.Player) :
             if g_t and (not (self.genres_and_tags & g_t)):
                 continue
 
-            log(LOG_INFO,'Subtitle: genre/tag preference {0} met with intersection {1}'.format(g_t, (self.genres_and_tags & g_t)))
+            log(LOG_INFO,'Subtitles: genre/tag preference {0} met with intersection {1}'.format(g_t, (self.genres_and_tags & g_t)))
             for pref in preferences:
                 name, codes, forced = pref
                 codes = codes.split(r',')
@@ -241,14 +241,14 @@ class LangPrefMan_Player(xbmc.Player) :
                                 log(LOG_INFO, u'Subtitle language of subtitle {0} matches preference {1} ({2}) forced {3}'.format(sub['index'], i, name, forced) )
                                 return sub['index']
 
-                    log(LOG_INFO, u'Subtitle: preference {0} ({1}:{2}) not available'.format(i, name, code) )
+                    log(LOG_INFO, u'Subtitles: preference {0} ({1}:{2}) not available'.format(i, name, code) )
         return -2
 
     def evalCondSubPrefs(self, condsub_prefs):
         log(LOG_DEBUG, 'Evaluating conditional subtitle preferences' )
         # if the audio track has been changed wait some time
         if (self.audio_changed and settings.delay > 0):
-            log(LOG_DEBUG, "Delaying preferences evaluation by {0} ms".format(4*settings.delay))
+            log(LOG_DEBUG, "Delaying preference evaluation by {0} ms".format(4*settings.delay))
             xbmc.sleep(4*settings.delay)
         log(LOG_DEBUG, 'Getting video properties')
         self.getDetails()
@@ -260,7 +260,7 @@ class LangPrefMan_Player(xbmc.Player) :
             if g_t and (not (self.genres_and_tags & g_t)):
                 continue
 
-            log(LOG_INFO,'Cond Sub: genre/tag preference {0} met with intersection {1}'.format(g_t, (self.genres_and_tags & g_t)))
+            log(LOG_INFO,'Conditional subtitles: genre/tag preference {0} met with intersection {1}'.format(g_t, (self.genres_and_tags & g_t)))
             for pref in preferences:
                 audio_name, audio_code, sub_name, sub_code, forced = pref
                 if (audio_code == 'non'):
@@ -279,7 +279,7 @@ class LangPrefMan_Player(xbmc.Player) :
                                     if (self.testForcedFlag(forced, sub['name'])):
                                         log(LOG_INFO, u'Language of subtitle {0} matches conditional preference {1} ({2}:{3}) forced {4}'.format(sub['index'], i, audio_name, sub_name, forced) )
                                         return sub['index']
-                            log(LOG_INFO, u'Conditional subtitle: no match found for preference {0} ({1}:{2})'.format(i, audio_name, sub_name) )
+                            log(LOG_INFO, u'Conditional subtitles: no match found for preference {0} ({1}:{2})'.format(i, audio_name, sub_name) )
         return -2
     
     def testForcedFlag(self, forced, subName):
